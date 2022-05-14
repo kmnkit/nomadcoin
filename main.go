@@ -11,10 +11,37 @@ type block struct {
 	prevHash string
 }
 
+type blockchain struct {
+	blocks []block
+}
+
+func (b *blockchain) getLastHash() string {
+	if len(b.blocks) > 0 {
+		return b.blocks[len(b.blocks)-1].hash
+	}
+	return ""
+}
+
+func (b *blockchain) addBlock(data string) {
+	newBlock := block{data, "", b.getLastHash()}                     // Create Block
+	hash := sha256.Sum256([]byte(newBlock.data + newBlock.prevHash)) // Hashing Block
+	newBlock.hash = fmt.Sprintf("%x", hash)
+	b.blocks = append(b.blocks, newBlock) // Appending Block
+	// This must be seperated
+}
+
+func (b *blockchain) listBlocks() {
+	for _, block := range b.blocks {
+		fmt.Printf("Data: %s\n", block.data)
+		fmt.Printf("Hash: %s\n", block.hash)
+		fmt.Printf("Prev Hash: %s\n", block.prevHash)
+	}
+}
+
 func main() {
-	genesisBlock := block{"Genesis Block", "", ""}
-	hash := sha256.Sum256([]byte(genesisBlock.data + genesisBlock.prevHash))
-	hexHash := fmt.Sprintf("%x", hash) // Sprintf는 프린트를 해주지는 않지만 String으로 반환해준다.
-	genesisBlock.hash = hexHash
-	fmt.Println(genesisBlock)
+	chain := blockchain{}
+	chain.addBlock("Genesis Block")
+	chain.addBlock("Second Block")
+	chain.addBlock("Third Block")
+	chain.listBlocks()
 }
