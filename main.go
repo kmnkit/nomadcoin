@@ -1,7 +1,11 @@
 package main
 
-import "github.com/kmnkit/nomadcoin/blockchain"
+import (
+	"github.com/kmnkit/nomadcoin/cli"
+	"github.com/kmnkit/nomadcoin/db"
+)
 
 func main() {
-	blockchain.Blockchain()
+	defer db.Close()
+	cli.Start()
 }
