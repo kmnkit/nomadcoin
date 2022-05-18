@@ -88,6 +88,7 @@ func jsonContentTypeMiddleware(next http.Handler) http.Handler {
 		rw.Header().Add("Content-Type", "application/json")
 		next.ServeHTTP(rw, r)
 	})
+
 }
 
 func Start(aPort int) {
