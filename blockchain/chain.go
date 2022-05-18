@@ -74,7 +74,7 @@ func (b *blockchain) difficulty() int {
 		return defaultDifficulty
 	} else if b.Height%difficultyInterval == 0 {
 		// recalculate the difficulty
-		b.recalculateDifficulty()
+		return b.recalculateDifficulty()
 	} else {
 		return b.CurrentDifficulty
 	}
