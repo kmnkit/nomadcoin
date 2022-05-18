@@ -10,7 +10,6 @@ import (
 )
 
 const (
-	port string = ":4000"
 	templateDir string = "explorer/templates/"
 )
 
@@ -21,12 +20,12 @@ type homeData struct {
 
 var templates *template.Template
 
-func home(w http.ResponseWriter, r *http.Request) {	
+func home(w http.ResponseWriter, r *http.Request) {
 	data := homeData{"Home", blockchain.GetBlockchain().AllBlocks()}
-	templates.ExecuteTemplate(w, "home", data)	
+	templates.ExecuteTemplate(w, "home", data)
 }
 
-func add(w http.ResponseWriter, r *http.Request){
+func add(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
 		templates.ExecuteTemplate(w, "add", nil)
@@ -40,11 +39,12 @@ func add(w http.ResponseWriter, r *http.Request){
 }
 
 // Start 탐색시작
-func Start(){
+func Start(port int) {
+	handler := http.NewServeMux()
 	templates = template.Must(template.ParseGlob(templateDir + "pages/*.gohtml"))
 	templates = template.Must(templates.ParseGlob(templateDir + "partials/*.gohtml"))
-	http.HandleFunc("/", home)
-	http.HandleFunc("/add", add)
-	fmt.Printf("Listening on http://localhost%s\n", port)
-	log.Fatal(http.ListenAndServe(port, nil))	
+	handler.HandleFunc("/", home)
+	handler.HandleFunc("/add", add)
+	fmt.Printf("Listening on http://localhost:%d\n", port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), handler))
 }
