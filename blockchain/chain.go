@@ -1,6 +1,9 @@
 package blockchain
 
 import (
+	"bytes"
+	"encoding/gob"
+	"fmt"
 	"sync"
 
 	"github.com/kmnkit/nomadcoin/db"
@@ -14,6 +17,10 @@ type blockchain struct {
 
 var b *blockchain
 var once sync.Once
+
+func (b *blockchain) restore(data []byte) {
+	utils.HandleErr(gob.NewDecoder(bytes.NewReader(data)).Decode(b))
+}
 
 func (b *blockchain) persist() {
 	db.SaveBlockchain(utils.ToBytes(b))
@@ -30,8 +37,19 @@ func Blockchain() *blockchain {
 	if b == nil {
 		once.Do(func() {
 			b = &blockchain{"", 0}
-			b.AddBlock("Genesis")
+			fmt.Printf("NewestHash: %s\nHeight:%d", b.NewestHash, b.Height)
+			// search for checkpoint on the db
+			checkpoint := db.Checkpoint()
+			// restore b from bytes
+			if checkpoint == nil {
+				b.AddBlock("Genesis")
+			} else {
+				// restore b from bytes
+				fmt.Println("Restoring...")
+				b.restore(checkpoint)
+			}
 		})
 	}
+	fmt.Printf("NewestHash: %s\nHeight:%d", b.NewestHash, b.Height)
 	return b
 }
