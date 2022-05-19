@@ -8,7 +8,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kmnkit/nomadcoin/blockchain"
-	"github.com/kmnkit/nomadcoin/utils"
 )
 
 var port string
@@ -67,9 +66,7 @@ func blocks(rw http.ResponseWriter, r *http.Request) {
 	case "GET":
 		json.NewEncoder(rw).Encode(blockchain.Blockchain().Blocks())
 	case "POST":
-		var blockBody addBlockBody
-		utils.HandleErr(json.NewDecoder(r.Body).Decode(&blockBody))
-		blockchain.Blockchain().AddBlock(blockBody.Message)
+		blockchain.Blockchain().AddBlock()
 		rw.WriteHeader(http.StatusCreated)
 	}
 }
