@@ -116,7 +116,7 @@ func balance(rw http.ResponseWriter, r *http.Request) {
 		amount := blockchain.Blockchain().BalanceByAddress(address)
 		json.NewEncoder(rw).Encode(balanceResponse{address, amount})
 	default:
-		utils.HandleErr(json.NewEncoder(rw).Encode(blockchain.Blockchain().TxOutsByAddress(address)))
+		utils.HandleErr(json.NewEncoder(rw).Encode(blockchain.Blockchain().UTxOutsByAddress(address)))
 	}
 }
 
@@ -130,6 +130,7 @@ func transactions(rw http.ResponseWriter, r *http.Request) {
 	err := blockchain.Mempool.AddTx(payload.To, payload.Amount)
 	if err != nil {
 		json.NewEncoder(rw).Encode(errorResponse{"not enough funds"})
+		return
 	}
 	rw.WriteHeader(http.StatusCreated)
 }
