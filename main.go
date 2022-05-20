@@ -1,11 +1,9 @@
 package main
 
-import (
-	"github.com/kmnkit/nomadcoin/cli"
-	"github.com/kmnkit/nomadcoin/db"
-)
+import "github.com/kmnkit/nomadcoin/wallet"
 
 func main() {
-	defer db.Close()
-	cli.Start()
+	// defer db.Close()
+	// cli.Start()
+	wallet.Start()
 }
