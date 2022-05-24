@@ -54,10 +54,14 @@ func restoreKey() (key *ecdsa.PrivateKey) { // named return을 하면 미리 초
 	return
 }
 
+func encodeBigInts(a, b []byte) string {
+	z := append(a, b...)
+	return fmt.Sprintf("%x", z)
+}
+
 func aFromK(key *ecdsa.PrivateKey) string {
 	// This is awesome
-	z := append(key.X.Bytes(), key.Y.Bytes()...)
-	return fmt.Sprintf("%x", z)
+	return encodeBigInts(key.X.Bytes(), key.Y.Bytes())
 }
 
 func sign(payload string, w *wallet) string {
@@ -65,8 +69,7 @@ func sign(payload string, w *wallet) string {
 	utils.HandleErr(err)
 	r, s, err := ecdsa.Sign(rand.Reader, w.privateKey, payloadAsB)
 	utils.HandleErr(err)
-	signature := append(r.Bytes(), s.Bytes()...)
-	return fmt.Sprintf("%x", signature) // hexadecimal signature
+	return encodeBigInts(r.Bytes(), s.Bytes())
 }
 
 func restoreBigInts(payload string) (*big.Int, *big.Int, error) {
