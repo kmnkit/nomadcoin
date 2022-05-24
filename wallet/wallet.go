@@ -5,6 +5,8 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/x509"
+	"encoding/hex"
+	"fmt"
 	"os"
 
 	"github.com/kmnkit/nomadcoin/utils"
@@ -12,7 +14,7 @@ import (
 
 type wallet struct {
 	privateKey *ecdsa.PrivateKey
-	address    string // 16진수
+	Address    string // 16진수
 }
 
 const (
@@ -52,7 +54,23 @@ func restoreKey() (key *ecdsa.PrivateKey) { // named return을 하면 미리 초
 }
 
 func aFromK(key *ecdsa.PrivateKey) string {
-	//
+	// This is awesome
+	z := append(key.X.Bytes(), key.Y.Bytes()...)
+	return fmt.Sprintf("%x", z)
+}
+
+func sign(payload string, w *wallet) string {
+	payloadAsB, err := hex.DecodeString(payload)
+	utils.HandleErr(err)
+	r, s, err := ecdsa.Sign(rand.Reader, w.privateKey, payloadAsB)
+	utils.HandleErr(err)
+	signature := append(r.Bytes(), s.Bytes()...)
+	return fmt.Sprintf("%x", signature) // hexadecimal signature
+}
+
+// verify 검증
+func verify(signature, payload, publicKey string) bool {
+
 }
 
 func Wallet() *wallet {
@@ -67,7 +85,7 @@ func Wallet() *wallet {
 			w.privateKey = key
 		}
 		// no -> create private key, save to file
-		w.address = aFromK(w.privateKey)
+		w.Address = aFromK(w.privateKey)
 	}
 	return w
 }
