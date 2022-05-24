@@ -1,6 +1,7 @@
 package wallet
 
 import (
+	"crypto/ecdsa"
 	"crypto/x509"
 	"encoding/hex"
 	"fmt"
@@ -18,14 +19,13 @@ const (
 func Start() {
 	privateByte, err := hex.DecodeString(privateKey)
 	utils.HandleErr(err)
-	private, err = x509.ParseECPrivateKey(privateByte) // byte를 받아서 비공개키를 반환해줌
+	private, err := x509.ParseECPrivateKey(privateByte) // byte를 받아서 비공개키를 반환해줌
 	utils.HandleErr(err)
 
 	sigBytes, err := hex.DecodeString(signature)
 
 	rBytes := sigBytes[:len(sigBytes)/2]
 	sBytes := sigBytes[len(sigBytes)/2:]
-	fmt.Printf("%d\n\n%d\n\n%d\n\n", sigBytes, rBytes, sBytes)
 
 	var bigR, bigS = big.Int{}, big.Int{}
 
@@ -33,5 +33,12 @@ func Start() {
 	bigR.SetBytes(rBytes)
 	bigS.SetBytes(sBytes)
 
-	fmt.Println(bigR, bigS)
+	hashBytes, err := hex.DecodeString(hashedMessage)
+
+	utils.HandleErr(err)
+
+	ok := ecdsa.Verify(&private.PublicKey, hashBytes, &bigR, &bigS)
+
+	fmt.Println(ok)
+
 }
